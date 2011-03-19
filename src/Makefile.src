@@ -103,6 +103,7 @@ ANGFILES = \
 	prefs.o \
 	player/calcs.o \
 	player/class.o \
+	player/fake.o \
 	player/player.o \
 	player/race.o \
 	player/spell.o \
