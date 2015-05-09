@@ -326,6 +326,9 @@ static void Term_init_gcu(term *t) {
 	/* Flush changes */
 	wrefresh(td->win);
 
+	/* Enable receiving of mouse events */
+	mousemask(ALL_MOUSE_EVENTS, NULL);
+
 	/* Game keymap */
 	keymap_game();
 }
@@ -506,6 +509,8 @@ static void do_gcu_resize(void) {
  */
 static errr Term_xtra_gcu_event(int v) {
 	int i, j, k, mods=0;
+	MEVENT event;
+	int button = 0; 
 
 	if (v) {
 		/* Wait for a keypress; use halfdelay(1) so if the user takes more */
@@ -545,6 +550,29 @@ static errr Term_xtra_gcu_event(int v) {
 		cbreak();
 		do_gcu_resize();
 		if (i == ERR) return (1);
+	}
+	if (i == KEY_MOUSE) {
+		if (getmouse(&event) == OK) {
+			if (event.bstate & BUTTON1_CLICKED) {
+				button = 1;
+			} else if (event.bstate & BUTTON2_CLICKED) {
+				button = 2;
+			} else if (event.bstate & BUTTON3_CLICKED) {
+				button = 3;
+			} else if (event.bstate & BUTTON4_CLICKED) {
+				button = 4;
+			}
+			if (event.bstate & BUTTON_CTRL) {
+				button |= 0x10;
+			}
+			if (event.bstate & BUTTON_SHIFT) {
+				button |= 0x20;
+			}
+			if (event.bstate & BUTTON_ALT) {
+				button |= 0x40;
+			}
+			Term_mousepress(event.x, event.y, button);
+		}
 	}
 	#endif
 
